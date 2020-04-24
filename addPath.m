@@ -1,4 +1,2 @@
-addpath(genpath('integration'));
-addpath('models');
+addpath(genpath('src'));
 addpath('test');
-addpath('misc');
