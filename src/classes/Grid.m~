@@ -22,7 +22,9 @@ classdef Grid
             obj.difference = difference;
             nonZeroPoints = initialize_ic_grid(resolution, domain, 2);
             obj.points = zeros(size(nonZeroPoints,1), dimension);
-            
+            for i = 1:length(variables) % fill in the places of the nonzero variables
+                obj.points(, :) = nonZeroPoints(i,:);
+            end
 
         end
     end

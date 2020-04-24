@@ -23,7 +23,7 @@ classdef Grid
             nonZeroPoints = initialize_ic_grid(resolution, domain, 2);
             obj.points = zeros(size(nonZeroPoints,1), dimension);
             for i = 1:length(variables) % fill in the places of the nonzero variables
-                obj.points(variables(i), :) = nonZeroPoints(i,:);
+                obj.points(:, variables(i)) = nonZeroPoints(:,i);
             end
 
         end
