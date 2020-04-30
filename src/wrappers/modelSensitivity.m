@@ -9,6 +9,6 @@ function MSsq = modelSensitivity(system, grid, timeSpan, timeStep, isParallel)
 %   isParallel is a flag. if true, will use parallelized trajectory
 %   advection
 derivative = @(t,x,e,eov) system.rhs(t,x, e, eov);  % have to keep this form for compute
-MSsq = modelSensitivityGlobal(derivative, grid.points, grid.resolution,  timeSpan, timeStep, 'finiteDifference', isParallel, system.Deltas); %keep only maximal eigenvalue from the outputs
+MSsq = modelSensitivityGlobal(derivative, grid.points, grid.resolution,  timeSpan, timeStep, 'finiteDifference', isParallel, system.deltas); %keep only maximal eigenvalue from the outputs
 end
 
