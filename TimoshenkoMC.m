@@ -7,7 +7,8 @@ beamStruct = load('beam.mat');
 odefunction = generateFirstOrderODE(beamStruct);
 dy = @(t,x,e,eov) odefunction(t,x,e,eov);
 timoshenkoBeam = DynSystem(dy, ndof_spv, [1,1]);
-
-mc = monteCarloUQ(timoshenkoBeam, 1e-5, 1000, true);
-
-save('mc.mat', 'mc');
+%%first run:
+pool = parpool('local', 16);
+mc = monteCarloUQ(timoshenkoBeam, 1e-5, 1024, true, 0);
+save('mc1.mat', 'mc');
+pool.delete();
