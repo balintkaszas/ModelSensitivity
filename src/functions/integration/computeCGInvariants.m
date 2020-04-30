@@ -32,7 +32,7 @@ nRows = size(initialPosition,1); %number of gridpoints
 
 switch method
     case 'finiteDifference'
-        derivEov = @(t,x) derivative(t,x,0,false);
+        derivEov = @(t,x) derivative(t,x);
         relDelta = 1e-5; %% convenience
         differences = diff(initialPosition);
         maximalDifference = max(differences, [], 'all'); %% max. difference over the grid
@@ -42,11 +42,6 @@ switch method
             Diff = maximalDifference; %% if it is nonzero, proceed with that. 
         end
         dFlowmap = CGfromFD(derivEov, initialPosition, Diff, relDelta, timeSpan, isParallel);
-
-
-    case 'eoV'
-        derivEov = @(t,x) derivative(t,x,0,true);
-        dFlowmap = CGfromEoV(derivEov, initialPosition, timeSpan);
 end
     %loop through the array of nSystem by nSystem matrices and compute
     %eigenvalues for each entry:

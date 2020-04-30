@@ -31,9 +31,9 @@ classdef DynSystem
             end
     end
         
-        function dy = rhs(obj, t, x, e, eov)
+        function dy = rhs(obj, t, x)
             %rhs Method: Evaluate right hand side
-            dy = obj.rhsFn(t,x,e,eov);
+            dy = obj.rhsFn(t,x);
         end
         function dy = gradRhs(obj, t, x)
             %gradRhs method: Evaluate gradient of right hand side

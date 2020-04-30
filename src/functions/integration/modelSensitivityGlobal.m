@@ -51,7 +51,7 @@ CGTraceToSum = zeros(nRows, size(range,1)); %% same for the CG trace
 for i = 1:n %%loop over the time interval
 
     [cgmax, cgtrace] = computeCGInvariants(derivative, grid, [range(i), timeSpan(2)], method, isParallel); %Just pass the method argument to computeCGInvariants
-    grid = ode45_vector_nonvectorized(@(t,y)derivative(t,y,0,false), [range(i), range(i) + stepSize], grid, isParallel); % Advect the gridpoints to the next time instant 
+    grid = ode45_vector_nonvectorized(@(t,y)derivative(t,y), [range(i), range(i) + stepSize], grid, isParallel); % Advect the gridpoints to the next time instant 
     CGMaxToSum(:,i) = sqrt(cgmax); % computeCGInvariants returns the eigenvalue, need to integrate the square root of it
     CGTraceToSum(:,i) = cgtrace;  
 end

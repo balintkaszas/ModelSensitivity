@@ -1,5 +1,5 @@
 function MC = monteCarloUQ(system, epsilon, Nsamples, isParallel, seed)
-    deriv = @(t,x) system.rhs(t,x,0,false);    %% unperturbed system
+    deriv = @(t,x) system.rhs(t,x);    %% unperturbed system
     rng(seed);
     maxPlace = rand(system.dimension, 1)*1e-5;
     dt = 1e-5*pi;
@@ -9,7 +9,7 @@ function MC = monteCarloUQ(system, epsilon, Nsamples, isParallel, seed)
     Montecarlos = zeros([size(yfref),Nsamples]);
     
     tic;
-    [t, mssq] = modelSensitivityTrajectory(system, maxPlace, [0,2*pi], pi/100.);
+    [t, mssq] = modelSensitivityTrajectory(system, maxPlace.', [0,2*pi], pi/100.);
     toc
     f = @(t,x) deriv(t, x) + epsilon*detPerturbation(t, x, 1, system.dimension); %deterministic part of the SDE
     g = @(t,x) epsilon*stochPerturbation(t, x, system.dimension); 
