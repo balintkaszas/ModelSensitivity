@@ -23,12 +23,12 @@ classdef DynSystem
             obj.rhsFn = rhs;
             obj.dimension = dimension;
             obj.deltas = deltas;
-            if(varargin{1})
+            if(nargin > 3) % at least 3 arguments must be given 
                 obj.gradRhsFn = varargin{1}; %assign the optional argument
             end
     end
         
-        function dy = rhs(obj, t, x)
+        function dy = rhs(obj, t, x, e, eov)
             %METHOD1 Evaluate right hand side
             %   Detailed explanation goes here
             dy = obj.rhsFn(t,x,e,eov);
