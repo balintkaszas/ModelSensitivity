@@ -88,7 +88,7 @@ function dflowmap = CGfromFD(derivative, initialPosition, Diff, relDelta, timeSp
                     dir = zeros(size(ic));
                     dir(j) = 1; % perturbation vector, with only the jth coordinate being nonzero
                     ic1 = ic + dir * Delta; % new auxiliary gridpoint in each direction
-                    ic2 = ic - dir * Delta; 
+                    ic2 = ic - dir * Delta; % for central difference, each direction has 2 new points
                     [~,sol1] = ode45(derivative, timeSpan, ic1, odeset('relTol', 1e-12)); 
                     [~,sol2] = ode45(derivative, timeSpan, ic2, odeset('relTol', 1e-12)); 
                     sol1 = sol1(end, :);
@@ -100,7 +100,7 @@ function dflowmap = CGfromFD(derivative, initialPosition, Diff, relDelta, timeSp
             end 
             
         else
-            for i= 1:nRows %parallel loop through ICS
+            for i= 1:nRows %regular loop through ICS
                 ic = initialPosition(i,:);
                 for j = 1:nSystem
                     dir = zeros(size(ic));

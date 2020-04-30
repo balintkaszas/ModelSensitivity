@@ -1,6 +1,9 @@
 classdef DynSystem
     %DYNSYSTEM Represents a dynamical system
-    %   Detailed explanation goes here
+    %   contains the Right Hand Side,
+    %   dimension
+    %   estimated model-uncertainties
+    %   optionally: gradient of the right hand side
     
     properties
         rhsFn
@@ -29,13 +32,11 @@ classdef DynSystem
     end
         
         function dy = rhs(obj, t, x, e, eov)
-            %METHOD1 Evaluate right hand side
-            %   Detailed explanation goes here
+            %rhs Method: Evaluate right hand side
             dy = obj.rhsFn(t,x,e,eov);
         end
         function dy = gradRhs(obj, t, x)
-            %METHOD1 Evaluate gradient of right hand side
-            %   Detailed explanation goes 
+            %gradRhs method: Evaluate gradient of right hand side
             if(obj.gradRhsFn)
                 dy = obj.gradRhsFn(t, x);
             end
