@@ -59,7 +59,8 @@ end
 summCGMax = trapz(range, CGMaxToSum, 2); %Trapezoid integration separately
 summCGTrace = trapz(range, CGTraceToSum, 2); %then add them together with the weights
 
-D1, D2 = Deltas; %get weights from the argument
+D1 = Deltas(1); %get weights from the argument
+D2 = Deltas(2);
 % return the value in the correct shape
 MS = reshape((D1^2)*summCGMax.^2 + D2*summCGTrace, fliplr(resolution));  %% this returns the square of the model sensitivity!
 end
