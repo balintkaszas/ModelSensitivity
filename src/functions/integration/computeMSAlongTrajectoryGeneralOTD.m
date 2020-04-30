@@ -1,4 +1,4 @@
-function [t,uncertAtTime] = computeAlongTrajectoryVariationGeneralFullmodelOTD(derivative,derivativeEov, initialPoint, timeInterval, stepSize,r, Deltas)
+function [t,uncertAtTime] = computeMSAlongTrajectoryGeneralOTD(derivative,derivativeEov, initialPoint, timeInterval, stepSize,r, Deltas)
 t = timeInterval(1):stepSize:timeInterval(2);
 n = length(t);
 uncertAtTime = zeros(size(t));
