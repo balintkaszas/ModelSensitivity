@@ -8,7 +8,7 @@ function ftle = FTLE(system, grid, timeSpan, isParallel)
 %   timespan is [t0,t] : the time interval of the computation
 %   isParallel is a flag. if true, will use parallelized trajectory
 %   advection
-derivative = @(t,x,e,eov) system.rhs(t,x, e, eov);  % have to keep this form for computeCGInvariants
+derivative = @(t,x) system.rhs(t,x);  % have to keep this form for computeCGInvariants
 [Eigmax, ~] = computeCGInvariants(derivative, grid.points, timeSpan, 'finiteDifference', isParallel); %keep only maximal eigenvalue from the outputs
 ftle = reshape(log(Eigmax), grid.resolution)/(2*(timeSpan(2) - timeSpan(1)));
 end

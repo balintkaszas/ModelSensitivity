@@ -1,4 +1,4 @@
-function [cgEigenvalueMax,cgTrace] = computeCGInvariants(derivative, initialPosition, timeSpan, method, isParallel)
+function [cgEigenvalueMax, cgTrace] = computeCGInvariants(derivative, initialPosition, timeSpan, method, isParallel)
 %% Computes the largest eigenvalue of the Cauchy Green tensor, along with the trace
 % Arguments:
 % derivative: function handle that returns RHS of the dynamical system 
@@ -37,7 +37,7 @@ switch method
         differences = diff(initialPosition);
         maximalDifference = max(differences, [], 'all'); %% max. difference over the grid
         if(maximalDifference == 0) %% if only one point is in the grid ==> difference is 0
-            Diff = 1e-4; %% set a default value in this case
+            Diff = 1e-6; %% set a default value in this case
         else
             Diff = maximalDifference; %% if it is nonzero, proceed with that. 
         end
@@ -52,22 +52,6 @@ end
 end
 
 
-function dFlowMap = CGfromEoV(derivative, initialPosition, timeSpan, isParallel)
-    %% Calculates the Cauchy Green strain tensor from the equation of variations
-    % append the initial nSystem x nRows to a nSystem + nSystem^2 x nRows
-    % matrix
-    nSystem =  size(initialPosition,2); % number of variables
-    nRows = size(initialPosition,1); %number of gridpoints
-
-    dFlowMap0 = eye(nSystem);
-    dFlowMap0 = reshape(dFlowMap0,nSystem*nSystem,1); %% IC for EOV is unity
-    initialPosition = [initialPosition,repmat(transpose(dFlowMap0),size(initialPosition,1),1)]; % prepare the ensemble ICs
-
-    solution = ode45_vector_nonvectorized(@(t,y)derivative(t,y),timeSpan,initialPosition, isParallel);
-    dFlowMap = solution(:,nSystem+1:end); %% separate the part of dF
-    dFlowMap = reshape(transpose(dFlowMap),[nSystem nSystem nRows]);
-    % 
-end
 
 
 function dflowmap = CGfromFD(derivative, initialPosition, Diff, relDelta, timeSpan, isParallel)
@@ -75,6 +59,7 @@ function dflowmap = CGfromFD(derivative, initialPosition, Diff, relDelta, timeSp
         nSystem = size(initialPosition,2);
         nRows = size(initialPosition,1);
         Delta = Diff*relDelta; 
+        disp(Delta)
         dflowmap = zeros(nSystem, nSystem, nRows);
         if isParallel == true
             parfor i= 1:nRows %parallel loop through ICS
@@ -84,8 +69,8 @@ function dflowmap = CGfromFD(derivative, initialPosition, Diff, relDelta, timeSp
                     dir(j) = 1; % perturbation vector, with only the jth coordinate being nonzero
                     ic1 = ic + dir * Delta; % new auxiliary gridpoint in each direction
                     ic2 = ic - dir * Delta; % for central difference, each direction has 2 new points
-                    [~,sol1] = ode45(derivative, timeSpan, ic1, odeset('relTol', 1e-12)); 
-                    [~,sol2] = ode45(derivative, timeSpan, ic2, odeset('relTol', 1e-12)); 
+                    [~,sol1] = ode15s(derivative, timeSpan, ic1, odeset('relTol', 1e-12)); 
+                    [~,sol2] = ode15s(derivative, timeSpan, ic2, odeset('relTol', 1e-12)); 
                     sol1 = sol1(end, :);
                     sol2 = sol2(end, :);
                     for k = 1:nSystem
@@ -102,8 +87,8 @@ function dflowmap = CGfromFD(derivative, initialPosition, Diff, relDelta, timeSp
                     dir(j) = 1; % perturbation vector, with only the jth coordinate being nonzero
                     ic1 = ic + dir * Delta; % new auxiliary gridpoint in each direction
                     ic2 = ic - dir * Delta; 
-                    [~,sol1] = ode45(derivative, timeSpan, ic1, odeset('relTol', 1e-12)); 
-                    [~,sol2] = ode45(derivative, timeSpan, ic2, odeset('relTol', 1e-12)); 
+                    [~,sol1] = ode15s(derivative, timeSpan, ic1, odeset('relTol', 1e-13)); 
+                    [~,sol2] = ode15s(derivative, timeSpan, ic2, odeset('relTol', 1e-13)); 
                     sol1 = sol1(end, :);
                     sol2 = sol2(end, :);
                     for k = 1:nSystem

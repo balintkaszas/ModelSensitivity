@@ -12,7 +12,7 @@ tsteps = [tspan(1), (tspan(1)+tspan(2))/2, tspan(2)];
 if nRows == 1
     y = y0(1,:);
     y = y(:);
-    [~,solution] = ode45(fun, tsteps, y, odeset('relTol',1e-12));  
+    [~,solution] = ode15s(fun, tsteps, y, odeset('relTol',1e-12));  
     solution = solution(end,:);
     yf(1,:) = transpose(solution);    
 end
@@ -22,7 +22,7 @@ if nRows > 1
         parfor i=1:nRows
             y = y0(i,:);   %get current grid point
             y = y(:);  %flatten it
-            [~,solution] = ode45(fun, tsteps, y, odeset('relTol',1e-12));  
+            [~,solution] = ode15s(fun, tsteps, y, odeset('relTol',1e-12));  
             solution = solution(end,:);
             yf(i,:) = transpose(solution);
         end
@@ -30,7 +30,7 @@ if nRows > 1
         for i=1:nRows %use regular for otherwise
             y = y0(i,:);
             y = y(:);
-            [~,solution] = ode45(fun,tsteps,y, odeset('relTol',1e-12));  
+            [~,solution] = ode15s(fun,tsteps,y, odeset('relTol',1e-12));  
             solution = solution(end,:);
             yf(i,:) = transpose(solution);
         end
