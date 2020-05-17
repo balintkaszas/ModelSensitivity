@@ -1,4 +1,4 @@
-function ftle = FTLE(system, grid, timeSpan, isParallel)
+function ftle = FTLE(system, grid, timeSpan, isParallel, tol)
 %FTLE wrapper to compute the finite time lyapunov exponent using a
 %DynSystem
 %object.
@@ -9,7 +9,8 @@ function ftle = FTLE(system, grid, timeSpan, isParallel)
 %   isParallel is a flag. if true, will use parallelized trajectory
 %   advection
 derivative = @(t,x) system.rhs(t,x);  % have to keep this form for computeCGInvariants
-[Eigmax, ~] = computeCGInvariants(derivative, grid.points, timeSpan, 'finiteDifference', isParallel); %keep only maximal eigenvalue from the outputs
-ftle = reshape(log(Eigmax), grid.resolution)/(2*(timeSpan(2) - timeSpan(1)));
+derivativeEOV = @(t,x) system.gradRhs(t, x);
+[Eigmax, ~] = computeCGInvariantsode45EOV(derivative, derivativeEOV, grid.points, timeSpan, isParallel, tol); %keep only maximal eigenvalue from the outputs
+ftle = reshape(Eigmax, grid.resolution);
 end
 

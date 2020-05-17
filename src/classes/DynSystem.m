@@ -37,12 +37,11 @@ classdef DynSystem
         end
         function dy = gradRhs(obj, t, x)
             %gradRhs method: Evaluate gradient of right hand side
-            if(obj.gradRhsFn)
-                dy = obj.gradRhsFn(t, x);
-            end
-            
-            
+            dy = obj.gradRhsFn(t, x);
         end
+            
+            
+    
     end
 end
 

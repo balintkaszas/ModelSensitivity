@@ -1,7 +1,8 @@
 function MC = monteCarloUQ(system, epsilon, Nsamples, isParallel, seed)
     deriv = @(t,x) system.rhs(t,x);    %% unperturbed system
     rng(seed);
-    maxPlace = rand(system.dimension, 1)*1e-5;
+    %maxPlace = rand(system.dimension, 1)*1e-8;
+    maxPlace = zeros(system.dimension, 1);
     dt = 1e-5*pi;
     time = 0:dt:2*pi; %%One period
     time2 = time(1:1000:end);
