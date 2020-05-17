@@ -1,4 +1,4 @@
-function yf = ode45_vector_nonvectorized(fun, tspan,y0, isParallel)
+function yf = ode45_vector_nonvectorized_massmtx_parallel(fun,MassMtx, tspan,y0, isParallel)
 %% Wrapper to advect a grid of points, with a non-vectorized derivative
 
 nRows = size(y0,1);
@@ -12,7 +12,7 @@ tsteps = [tspan(1), (tspan(1)+tspan(2))/2, tspan(2)];
 if nRows == 1
     y = y0(1,:);
     y = y(:);
-    [~,solution] = ode15s(fun, tsteps, y, odeset('relTol',1e-12));  
+    [~,solution] = ode15s(fun, tsteps, y, odeset('relTol',1e-12, 'absTol', 1e-13, 'Mass', MassMtx));  
     solution = solution(end,:);
     yf(1,:) = transpose(solution);    
 end
