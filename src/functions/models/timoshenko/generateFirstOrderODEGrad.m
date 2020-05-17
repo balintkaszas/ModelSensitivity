@@ -1,4 +1,4 @@
-function odeFunction = generateFirstOrderODE(system)
+function gradOdeFunction = generateFirstOrderODEGrad(system)
 %from the system class that contains symbolic functions describing the
 %second order system, it returns the right hand side of the first order
 %system and the gradient of the system.
@@ -27,7 +27,7 @@ FgradNum = matlabFunction(Fgrad, 'vars', X);
 A = double(A);
 Asparse = sparse(A);
 odeFunction = @(t, xvar, e, eov) odfunc(t, xvar, e, eov, Asparse, Fnn);
-gradOdeFunction = @(t, xvar, e, eov) gradfunc(t, xvar, e, eov, Asparse, FgradNum);
+gradOdeFunction = @(t, xvar, e, eov) gradfunc(t, xvar, e, eov,  Asparse, FgradNum);
 
 end
 
@@ -39,5 +39,5 @@ end
 
 function odf = gradfunc(t, xvar, e, eov, A, FgradNum ) %returns the jacobian matrix A+\nabla Fnl(X)
     unpacked = num2cell(xvar);
-    odf = A ;%+ FgradNum(unpacked{:}); % FgradNum expects separate variables as argument, instead of a vector..
+    odf = A + FgradNum(unpacked{:}); % FgradNum expects separate variables as argument, instead of a vector..
 end

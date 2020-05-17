@@ -1,4 +1,4 @@
-function odeFunction = generateFirstOrderODE(system)
+function A = generateFirstOrderODEMTX(system)
 %from the system class that contains symbolic functions describing the
 %second order system, it returns the right hand side of the first order
 %system and the gradient of the system.
@@ -26,7 +26,7 @@ FgradNum = matlabFunction(Fgrad, 'vars', X);
 
 A = double(A);
 Asparse = sparse(A);
-odeFunction = @(t, xvar, e, eov) odfunc(t, xvar, e, eov, Asparse, Fnn);
+odeFunction = @(t, xvar, e, eov) odfunc(t, xvar, e, eov, A, Fnn);
 gradOdeFunction = @(t, xvar, e, eov) gradfunc(t, xvar, e, eov, Asparse, FgradNum);
 
 end

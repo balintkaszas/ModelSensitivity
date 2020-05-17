@@ -14,7 +14,6 @@ function dy = OscillatorChain(t, x, n, m, k, c, g, T, alpha, e, eov)
 % g = 0.5;
 
 temp = spdiags(ones(n,1)*[-1 2 -1], [-1 0 1], sparse(n,n));
-temp(1,1) = 1;
 C = c * temp;
 K = k * temp;
 M = m*eye(n,n);
@@ -38,7 +37,7 @@ end
 
 function dy = oscChain(t, x, Fphi, Fnl, A, T, epsilon)
     %the actual differential equation in first order form
-    dy = A*x + Fnl(x) + Fphi(t, T) + epsilon;
+    dy = A*x + Fnl(x); %+ Fphi(t, T) + epsilon;
 end
 
 function f = SP_nonlinearity(x)
