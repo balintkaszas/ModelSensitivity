@@ -1,4 +1,4 @@
-function MS = modelSensitivityGlobal_integral_eov(derivative, derivgrad, initialPosition, timeSpan, toleranceFD, toleranceInt, Deltas)
+function MS = computeModelSensitivity(derivative, derivgrad, initialPosition, timeSpan, toleranceFD, toleranceInt, Deltas, isParallel, useReduced, r)
 %% Computes the model sensitivity, by integrating the invatiants of the CG tensor, _along_ trajectories, started from an initial grid.
 % creates a subdivision of the time interval, and evaluates the invariants
 % over time intervals of increasing length [t_0, tMax], [t_1, tMax], ...
@@ -39,18 +39,34 @@ function MS = modelSensitivityGlobal_integral_eov(derivative, derivgrad, initial
 % MS is the model sensitivity in case of purely deterministic error
 t0 = timeSpan(1);
 t = timeSpan(2);
-funsq = @(s) vecFtlePullback(derivative, derivgrad, initialPosition, s, t, t0, toleranceFD);
-Integral =  integral(funsq, t0, t, 'ArrayValued', true, 'AbsTol', toleranceInt);
+nRows = size(initialPosition, 1);
+nSystem = size(initialPosition, 2);
+Integral = zeros(nRows, 2);
+if isParallel == true
+    parfor i = 1:nRows
+        ic = initialPosition(i,:);
+        funsq = @(s) vecFtlePullback(derivative, derivgrad, ic, s, t, t0, toleranceFD, useReduced, r);
+        Integral(i, :) =  integral(funsq, t0, t, 'ArrayValued', true, 'AbsTol', toleranceInt);
+    end
+else
+    for i = 1:nRows
+        ic = initialPosition(i,:);
+        funsq = @(s) vecFtlePullback(derivative, derivgrad, ic, s, t, t0, toleranceFD, useReduced, r);
+        Integral(i, :) =  integral(funsq, t0, t, 'ArrayValued', true, 'AbsTol', toleranceInt);
+    end
+end
+
+
 D1 = Deltas(1); %get weights from the argument
 D2 = Deltas(2);
 % return the value in the correct shape
-MS = (D1^2)*Integral(1).^2 + D2*Integral(2);  %% this returns the square of the model sensitivity!
+MS = (D1^2)*Integral(:,1).^2 + D2*Integral(:,2);  %% this returns the square of the model sensitivity!
 end
 
 
 
 
-function [sqrteig,cgtrace] = ftlePullback(dy,derivgrad,  x0, s, t, t0, toleranceFD)
+function [sqrteig,cgtrace] = ftlePullback(dy, derivgrad,  x0, s, t, t0, toleranceFD, useReduced, r)
     % Computes the invariants of the Cauchy-Green strain tensor from s to
     % t, at a point x(s), on a trajectory starting from x0 at t0.
     % Advects the IC from t0 to s
@@ -65,7 +81,12 @@ function [sqrteig,cgtrace] = ftlePullback(dy,derivgrad,  x0, s, t, t0, tolerance
         x = ode45_vector_nonvectorized(dy, [t0, s], x0, false); % Advect the gridpoints to time s
     end
     if(s ~= t)
-        [cgmax, cgtrace] = computeCGInvariantsode45EOV(dy, derivgrad, x, [s, t], false, toleranceFD);
+        if useReduced == true
+            dT = (t-s)/10;
+            [cgmax, cgtrace] = computeOTD_ODE45(dy, derivgrad, x, [s, t], r, dT, true, false);
+        else
+            [cgmax, cgtrace] = computeCGInvariantsode45EOV(dy, derivgrad, x, [s, t], false, toleranceFD);
+        end
     else
         cgmax = 1;
         cgtrace = numel(x0); 
@@ -74,12 +95,12 @@ function [sqrteig,cgtrace] = ftlePullback(dy,derivgrad,  x0, s, t, t0, tolerance
 
 end
 
-function resultVec = vecFtlePullback(dy, MassMtx,  x0, s, t, t0, toleranceFD)
+function resultVec = vecFtlePullback(dy, derivgrad,  x0, s, t, t0, toleranceFD, useReduced, r)
     % vectorize the function ftlePullback in the variable s.
     % has the same arguments, accepts an array as "s".
     % returns a 2 by 1 array
     nMax = length(s);
-    [sqrteig, cgtrace] = arrayfun(@(idx)ftlePullback(dy, MassMtx, x0, s(idx), t, t0, toleranceFD),1:nMax); 
+    [sqrteig, cgtrace] = arrayfun(@(idx)ftlePullback(dy, derivgrad, x0, s(idx), t, t0, toleranceFD, useReduced, r),1:nMax); 
     resultVec(1) = sqrteig;
     resultVec(2) = cgtrace;
 end

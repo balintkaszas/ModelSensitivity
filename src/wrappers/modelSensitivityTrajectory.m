@@ -1,4 +1,4 @@
-function [t, MSsqtraj] = modelSensitivityTrajectory(system, point, timeSpan, timeStep)
+function [t, MSsqtraj] = modelSensitivityTrajectory(system, point, timeSpan, timeStep, useReduced, r)
 %Wrapper to compute the square of the Model Sensitivity
 %Integrates the maximal eigenvalue and trace of the CG strain tensor along
 %a trajectory, and returns the time dependence.
@@ -9,6 +9,8 @@ function [t, MSsqtraj] = modelSensitivityTrajectory(system, point, timeSpan, tim
 %   timespan is [t0,t] : the time interval of the computation
 
 derivative = @(t,x) system.rhs(t,x);  % have to keep this form for compute
-[t, MSsqtraj] = computeMSAlongTrajectoryGeneral(derivative, point, timeSpan, timeStep, 'finiteDifference', system.deltas);
+derivativeEov = @(t,x) system.gradRhs(t,x);
+
+[t, MSsqtraj] = computeMSAlongTrajectoryGeneral(derivative, derivativeEov, point, timeSpan, timeStep, 1e-8, 1e-1, system.deltas, useReduced, r);
 end
 

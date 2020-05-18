@@ -1,4 +1,4 @@
-function MSsq = modelSensitivity(system, grid, timeSpan, timeStep, isParallel)
+function MSsq = modelSensitivity(system, grid, timeSpan, isParallel, useReduced, r)
 %Wrapper to compute the square of the Model Sensitivity
 %Integrates the maximal eigenvalue and trace of the CG strain tensor along
 %trajectories. 
@@ -8,7 +8,9 @@ function MSsq = modelSensitivity(system, grid, timeSpan, timeStep, isParallel)
 %   timespan is [t0,t] : the time interval of the computation
 %   isParallel is a flag. if true, will use parallelized trajectory
 %   advection
-derivative = @(t,x,e,eov) system.rhs(t,x, e, eov);  % have to keep this form for compute
-MSsq = modelSensitivityGlobal(derivative, grid.points, grid.resolution,  timeSpan, timeStep, 'finiteDifference', isParallel, system.deltas); %keep only maximal eigenvalue from the outputs
+derivative = @(t,x) system.rhs(t,x);  % have to keep this form for compute
+derivativeEov = @(t,x) system.gradRhs(t,x);
+MSsq = computeModelSensitivity(derivative, derivativeEov, grid.points, timeSpan, 1e-8, 1e-1, system.deltas, isParallel, useReduced, r);
+MSsq = reshape(MSsq, grid.resolution);
 end
 

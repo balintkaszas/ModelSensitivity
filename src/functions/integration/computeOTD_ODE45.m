@@ -107,14 +107,18 @@ function [Tp,Determinant] = OTDEquation(derivative, derivativeEov, initialPositi
         [~, solUT] = ode45(derivv, [currtime, currtime+dT/2, currtime+dT], icU, odeset('absTol', 1e-8));
         
         UTnew = solUT(end, :);
+        Determinant = 0;
         Unew = UTnew(1:numel(U));
         Tpnew = UTnew(numel(U)+1:end);
-        U = reshape(Unew, size(U));
-        Tp = reshape(Tpnew, size(Tp));
-        Determinant = 0;
+
         if withTrace == true
             Determinant = solUT(end);
+            Tpnew = UTnew(numel(U)+1:end-1);
         end
+        
+        U = reshape(Unew, size(U));
+        Tp = reshape(Tpnew, size(Tp));
+
     %% ----------------- Performing Gram-Schmidt -------------
      for i=1:r
         for j=1:i-1
