@@ -50,13 +50,19 @@ function dflowmap = CGfromeov(derivative, derivativeEOV, initialPosition, timeSp
         dflowmap = zeros(nSystem, nSystem, nRows);
         deov = @(t,x) derivativeTogether(t,x, derivative, derivativeEOV, nSystem);
         if isParallel == true
-             parfor i= 1:nRows %regular loop through ICS
+                D = parallel.pool.DataQueue;
+                h = waitbar(0, 'Please wait ...');
+                afterEach(D, @nUpdateWaitbar);
+
+            parfor i= 1:nRows %regular loop through ICS
+
                 ic = initialPosition(i,:);
                 initEov = eye(nSystem);
                 x0 = [ic.'; initEov(:)];
                 [~, sol]  = ode45(deov, [timeSpan(1), timeSpan(1) + 0.5*(timeSpan(2)-timeSpan(1)), timeSpan(2)], x0, odeset('relTol', tolerance));
                 sol = sol(end,:);
                 dflowmap(:,:,i) = reshape(sol(nSystem+1:end), [nSystem, nSystem]);
+                send(D, i);
             end   
             
         else
@@ -79,3 +85,9 @@ function dy = derivativeTogether(t,x, deriv, derivgrad, nSystem)
     dymtx = Grad*xmtx;
     dy = [dyx; dymtx(:)];
 end
+
+
+function nUpdateWaitbar(~)
+        waitbar(p/N, h);
+        p = p + 1;
+    end
