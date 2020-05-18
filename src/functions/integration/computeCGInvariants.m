@@ -1,4 +1,5 @@
 function [cgEigenvalueMax, cgTrace] = computeCGInvariants(derivative, initialPosition, timeSpan, method, isParallel, tolerance)
+%%We trust this function... Tested against analytic example.
 %% Computes the largest eigenvalue of the Cauchy Green tensor, along with the trace
 % Arguments:
 % derivative: function handle that returns RHS of the dynamical system 

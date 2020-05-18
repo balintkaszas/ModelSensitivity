@@ -1,4 +1,4 @@
-function [ftle, TR] = FTLE(system, grid, timeSpan, isParallel, tol, isReduced, r)
+function [ftle, trace] = FTLE(system, grid, timeSpan, isParallel, tol, isReduced, r)
 %FTLE wrapper to compute the finite time lyapunov exponent using a
 %DynSystem
 %object.
@@ -17,7 +17,7 @@ if isReduced == true
     dT = diff(timeSpan)/20;
     [Eigmax, traces] = computeOTD_ODE45(derivative, derivativeEOV, grid.points, timeSpan, r, dT, false, isParallel);
 end
-ftle = reshape(Eigmax, grid.resolution);
-TR = reshape(traces, grid.resolution);
+    ftle = reshape(Eigmax, grid.resolution);
+    
 end
 

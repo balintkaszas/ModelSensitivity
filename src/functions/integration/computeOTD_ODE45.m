@@ -1,4 +1,4 @@
-function [cgEigenvalueMax,cgTrace] = computeOTD_ODE45(derivative, derivativeEov, initialPosition, timeSpan,r, dT, withTrace)
+function [cgEigenvalueMax,cgTrace] = computeOTD_ODE45(derivative, derivativeEov, initialPosition, timeSpan,r, dT, withTrace, isParallel)
 %% Computes the largest eigenvalue of the Cauchy Green tensor, along with the trace
 % Arguments:
 % derivative: function handle that returns RHS of the dynamical system 
@@ -34,13 +34,18 @@ nRows = size(initialPosition,1); %number of gridpoints
 Tp = zeros(r,r, nRows);
 Determinant = zeros(1, nRows);
 
-
-for i = 1:nRows
-    disp(i)
-    ic = initialPosition(i,:);
-    [Tp(:,:,i), Determinant(i)] = OTDEquation(derivative, derivativeEov, ic, timeSpan, r, dT, withTrace);
+if isParallel == true
+    parfor i = 1:nRows
+        ic = initialPosition(i,:);
+        [Tp(:,:,i), Determinant(i)] = OTDEquation(derivative, derivativeEov, ic, timeSpan, r, dT, withTrace);
+    end
 end
-
+if isParallel == false
+    for i = 1:nRows
+        ic = initialPosition(i,:);
+        [Tp(:,:,i), Determinant(i)] = OTDEquation(derivative, derivativeEov, ic, timeSpan, r, dT, withTrace);
+    end
+end
 %loop through the array of nSystem by nSystem matrices and compute
 %eigenvalues for each entry:
 reducedEig = arrayfun(@(idx)svd(Tp(:,:,idx)),1:nRows,'UniformOutput',false); 
@@ -49,8 +54,8 @@ cgEigenvalueMax = (reducedEig(1,:).^2); %%svd already returns singular values so
 
 cgProduct = prod(reducedEig.^2, 1); %Product of the first r eigenvalues
 cgTraceReduced = sum(reducedEig.^2,1);
-lambdaRPlus1 = (Determinant.^2./cgProduct).^(n-r);%%Estimate for the first eigenvalue NOT computed
-%cgEigenvalueMin = reducedEig(end,:).^2; %to 'fill' in the remaining n-r dimensions, use the smallest eigenvalue
+lambdaRPlus1 = (Determinant.^2./cgProduct).^(nSystem-r);%%Estimate for the first eigenvalue that was NOT computed
+%to 'fill' in the remaining n-r dimensions, use the smallest eigenvalue
 cgTrace = cgTraceReduced + (nSystem - r)*lambdaRPlus1;
 end
 
@@ -96,7 +101,7 @@ function [Tp,Determinant] = OTDEquation(derivative, derivativeEov, initialPositi
         Xp = solXp(end, :);
         icU = [U(:); Tp(:)];
         if withTrace == true
-            icU = [U(:); Tp(:), Determinant];
+            icU = [U(:); Tp(:); Determinant];
         end
         derivv = @(t,x) Velocity_Field_OTD(derivativeEov, t, Xp, x, nSystem, r, withTrace);
         [~, solUT] = ode45(derivv, [currtime, currtime+dT/2, currtime+dT], icU, odeset('absTol', 1e-8));
