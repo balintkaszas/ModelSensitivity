@@ -1,5 +1,5 @@
 
-addPath;
+%addPath;
 ndof = 16;  %16 degree of freedom Timoshenko beam
 ndof_spv = 2*ndof;
 system = load('beam.mat');
@@ -28,7 +28,7 @@ rhs = A*X.' + Fnl + 1e-4*Fphi*sin(omega*t);
 
 % compute the gradient symbolically 
 Fnn = matlabFunction(rhs, 'vars', {t,X}, 'File', 'TIMOSHENKODE_Pert');
-matlabFunction(dy, 'vars', {t, X} );
+%matlabFunction(dy, 'vars', {t, X} );
 
 % 
 % X = [x;xd].';
