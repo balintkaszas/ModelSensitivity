@@ -87,7 +87,7 @@ function [sqrteig,cgtrace] = ftlePullback(dy, derivgrad,  x0, s, t, t0, toleranc
     end
     if(s ~= t)
         if useReduced == true
-            dT = (t-s)/10;
+            dT = (t-s)/5;
             [cgmax, cgtrace] = computeOTD_ODE45(dy, derivgrad, x, [s, t], r, dT, true, false);
         else
             [cgmax, cgtrace] = computeCGInvariantsode45EOV(dy, derivgrad, x, [s, t], false, toleranceFD);
