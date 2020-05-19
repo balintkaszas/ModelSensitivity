@@ -29,6 +29,11 @@ rhs = A*X.' + Fnl + 1e-4*Fphi*sin(omega*t);
 % compute the gradient symbolically 
 Fnn = matlabFunction(rhs, 'vars', {t,X}, 'File', 'TIMOSHENKODE_Pert');
 %matlabFunction(dy, 'vars', {t, X} );
+A = double(A);
+save('A.mat', 'A');
+
+Fgrad = jacobian(Fnl, X);
+Fnn = matlabFunction(Fgrad, 'vars', {X}, 'File', 'TIMOSHENKODE_Grad_NL');
 
 % 
 % X = [x;xd].';
