@@ -11,6 +11,6 @@ function [t, MSsqtraj] = modelSensitivityTrajectory(system, point, timeSpan, tim
 derivative = @(t,x) system.rhs(t,x);  % have to keep this form for compute
 derivativeEov = @(t,x) system.gradRhs(t,x);
 
-[t, MSsqtraj] = computeMSAlongTrajectoryGeneral(derivative, derivativeEov, point, timeSpan, timeStep, 1e-8, 1e-1, system.deltas, useReduced, r);
+[t, MSsqtraj] = computeMSAlongTrajectoryGeneral(derivative, derivativeEov, point, timeSpan, timeStep, 1e-7, 1, system.deltas, useReduced, r);
 end
 

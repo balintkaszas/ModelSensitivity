@@ -50,10 +50,13 @@ function dflowmap = CGfromeov(derivative, derivativeEOV, initialPosition, timeSp
         dflowmap = zeros(nSystem, nSystem, nRows);
         deov = @(t,x) derivativeTogether(t,x, derivative, derivativeEOV, nSystem);
         if isParallel == true
-                D = parallel.pool.DataQueue;
-                h = waitbar(0, 'Please wait ...');
-                afterEach(D, @nUpdateWaitbar);
+            dq = parallel.pool.DataQueue;
 
+            wb = waitbar(0, 'Please wait...');
+            % Use the waitbar's UserData to track progress
+            wb.UserData = [0 nRows];
+            afterEach(dq, @(varargin) iIncrementWaitbar(wb));
+            afterEach(dq, @(idx) fprintf('Completed iteration: %d\n', idx));
             parfor i= 1:nRows %regular loop through ICS
 
                 ic = initialPosition(i,:);
@@ -62,7 +65,7 @@ function dflowmap = CGfromeov(derivative, derivativeEOV, initialPosition, timeSp
                 [~, sol]  = ode45(deov, [timeSpan(1), timeSpan(1) + 0.5*(timeSpan(2)-timeSpan(1)), timeSpan(2)], x0, odeset('relTol', tolerance));
                 sol = sol(end,:);
                 dflowmap(:,:,i) = reshape(sol(nSystem+1:end), [nSystem, nSystem]);
-                send(D, i);
+                send(dq, i);
             end   
             
         else
@@ -86,8 +89,9 @@ function dy = derivativeTogether(t,x, deriv, derivgrad, nSystem)
     dy = [dyx; dymtx(:)];
 end
 
-
-function nUpdateWaitbar(~)
-        waitbar(p/N, h);
-        p = p + 1;
-    end
+function iIncrementWaitbar(wb)
+ud = wb.UserData;
+ud(1) = ud(1) + 1;
+waitbar(ud(1) / ud(2), wb);
+wb.UserData = ud;
+end

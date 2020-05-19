@@ -97,14 +97,14 @@ function [Tp,Determinant] = OTDEquation(derivative, derivativeEov, initialPositi
     for k=1:kmax %Runge-Kutta steps
         %% ------------- Direct Calculation of FTLE ------------------
         currtime = (k-1)*dT;
-        [~, solXp] = ode45(derivative, [currtime, currtime+dT/2, currtime+dT], Xp, odeset('absTol', 1e-8));
+        [~, solXp] = ode45(derivative, [currtime, currtime+dT/2, currtime+dT], Xp, odeset('relTol', 1e-8));
         Xp = solXp(end, :);
         icU = [U(:); Tp(:)];
         if withTrace == true
             icU = [U(:); Tp(:); Determinant];
         end
         derivv = @(t,x) Velocity_Field_OTD(derivativeEov, t, Xp, x, nSystem, r, withTrace);
-        [~, solUT] = ode45(derivv, [currtime, currtime+dT/2, currtime+dT], icU, odeset('absTol', 1e-8));
+        [~, solUT] = ode45(derivv, [currtime, currtime+dT/2, currtime+dT], icU, odeset('relTol', 1e-8));
         
         UTnew = solUT(end, :);
         Determinant = 0;
