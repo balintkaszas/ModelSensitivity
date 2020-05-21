@@ -5,9 +5,9 @@ A = A.A;
 
 asd = @(x) TIMOSHENKODE_Grad_NL(x);
 
-fullode = @(t,x) TIMOSHENKODE_Pert(t, x.');
+fullode = @(t,x) TIMOSHENKODE(t, x.');
 time = linspace(0, 4, 100);
-rng(10);
+rng(0);
 x = rand(2,1);
 x0 = zeros(32,1);
 x0(16) = x(1);
@@ -37,3 +37,5 @@ figure(2)
 imagesc(MMax)
 set(gca, 'colorscale', 'log')
 colorbar
+
+save('gradCmp.mat', 'A', 'MMax')
