@@ -10,7 +10,7 @@ function MSsq = modelSensitivity(system, grid, timeSpan, isParallel, useReduced,
 %   advection
 derivative = @(t,x) system.rhs(t,x);  % have to keep this form for compute
 derivativeEov = @(t,x) system.gradRhs(t,x);
-MSsq = computeModelSensitivity(derivative, derivativeEov, grid.points, timeSpan, 1e-8, 1e-1, system.deltas, isParallel, useReduced, r);
+MSsq = computeModelSensitivity(derivative, derivativeEov, grid.points, timeSpan, 1e-6, 1, system.deltas, isParallel, useReduced, r);
 MSsq = reshape(MSsq, grid.resolution);
 end
 

@@ -1,6 +1,6 @@
 f = @(t,x) d_abc(t,x,0, false);
 
-resolution = [5,5]; %% coarse resolution
+resolution = [100,100]; %% coarse resolution
 domain = [0, 2*pi;0,2*pi];
 r  = 2;
 init = Grid(3, [1,2], resolution, domain, 1e-8);
@@ -8,22 +8,22 @@ init = Grid(3, [1,2], resolution, domain, 1e-8);
 % define system:
 ABC = DynSystem(f, 3, [1,1], @EOVABC);
 
-
+pool = parpool('local', 36);
 tolerance = 1e-12;
 dT = 0.1;
 timeSpan = [0, 8];
 disp('Regular MS starting')
 tic;
-MSOde45 = modelSensitivity(ABC, init, timeSpan, false, false, 0);
+MSOde45 = modelSensitivity(ABC, init, timeSpan, true, false, 0);
 toc
 disp('Reduced order MS (2nd order) starting')
 tic;
-MSOTD = modelSensitivity(ABC, init, timeSpan, false, true, 2);
+MSOTD = modelSensitivity(ABC, init, timeSpan, true, true, 2);
 toc
 
 
-x1i = linspace(0, 2*pi,5);
-x4i = linspace(0, 2*pi,5);
+x1i = linspace(0, 2*pi,100);
+x4i = linspace(0, 2*pi,100);
 subplot(2,2,1)
 title('ODE45 MS')
 surf(x1i,x4i,MSOde45);shading interp; axis equal;axis tight;colorbar;  xlabel('X_1'); ylabel('X_4')
@@ -38,7 +38,7 @@ colorbar
 
 
 
-
+pool.delete();
 function eov = EOVABC(t, x)
 A = sqrt(3);
 B = sqrt(2);

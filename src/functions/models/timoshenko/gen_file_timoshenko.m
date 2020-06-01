@@ -18,11 +18,11 @@ X = [x;xd].';
 
 A = [zeros(ndof),eye(ndof);-M\K,-M\C];
 Fnl = [zeros(ndof,1);-M\f];
-omega = 0.3;
+omega = 11.125;
 Fphi = zeros(ndof_spv, 1);
-Fphi(17:end) = 1;
+Fphi(end) = 1;
 syms t;
-rhs = A*X.' + Fnl + 100*Fphi*sin(omega*t);
+rhs = A*X.' + Fnl + 300*Fphi*sin(omega*t);
 %dy = @(t,y) odfunc(t, y, A, Fnn);
 
 
