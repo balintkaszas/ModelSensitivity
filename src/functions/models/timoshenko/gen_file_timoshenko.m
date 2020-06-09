@@ -17,12 +17,15 @@ ndof = length(x);
 X = [x;xd].';
 
 A = [zeros(ndof),eye(ndof);-M\K,-M\C];
-Fnl = [zeros(ndof,1);-M\f];
-omega = 11.125;
-Fphi = zeros(ndof_spv, 1);
+Fphi = zeros(ndof, 1);
 Fphi(end) = 1;
 syms t;
-rhs = A*X.' + Fnl + 300*Fphi*sin(omega*t);
+omega =11.125;
+
+Driving = 300*Fphi*sin(omega*t);
+Fnl = [zeros(ndof,1);-M\f + M\Driving];
+
+rhs = A*X.' + Fnl;
 %dy = @(t,y) odfunc(t, y, A, Fnn);
 
 
@@ -33,7 +36,7 @@ A = double(A);
 save('A.mat', 'A');
 
 Fgrad = jacobian(Fnl, X);
-Fnn = matlabFunction(Fgrad, 'vars', {X}, 'File', 'TIMOSHENKODE_Grad_NL');
+Fnn = matlabFunction(Fgrad, 'vars', {t, X}, 'File', 'TIMOSHENKODE_Grad_NL');
 
 % 
 % X = [x;xd].';
