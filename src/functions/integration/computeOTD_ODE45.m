@@ -35,9 +35,18 @@ Tp = zeros(r,r, nRows);
 Determinant = zeros(1, nRows);
 
 if isParallel == true
+    dq = parallel.pool.DataQueue;
+
+    wb = waitbar(0, 'Please wait...');
+    % Use the waitbar's UserData to track progress
+    wb.UserData = [0 nRows];
+    afterEach(dq, @(varargin) iIncrementWaitbar(wb));
+    afterEach(dq, @(idx) fprintf('Completed iteration: %d\n', idx));
     parfor i = 1:nRows
         ic = initialPosition(i,:);
         [Tp(:,:,i), Determinant(i)] = OTDEquation(derivative, derivativeEov, ic, timeSpan, r, dT, withTrace);
+        send(dq, i);
+
     end
 end
 if isParallel == false
@@ -158,4 +167,14 @@ output = [R(:);R_otd(:)];
 if withTrace == true
     output = [R(:);R_otd(:);trace(L)*Determinant];
 end
+end
+
+
+
+
+function iIncrementWaitbar(wb)
+ud = wb.UserData;
+ud(1) = ud(1) + 1;
+waitbar(ud(1) / ud(2), wb);
+wb.UserData = ud;
 end

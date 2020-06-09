@@ -43,15 +43,18 @@ nRows = size(initialPosition, 1);
 nSystem = size(initialPosition, 2);
 Integral = zeros(nRows, 2);
 if isParallel == true
-    D = parallel.pool.DataQueue;
-    h = waitbar(0, 'Please wait ...');
-    afterEach(D, @nUpdateWaitbar);
+    dq = parallel.pool.DataQueue;
 
+    wb = waitbar(0, 'Please wait...');
+    % Use the waitbar's UserData to track progress
+    wb.UserData = [0 nRows];
+    afterEach(dq, @(varargin) iIncrementWaitbar(wb));
+    afterEach(dq, @(idx) fprintf('Completed iteration: %d\n', idx));
     parfor i = 1:nRows
         ic = initialPosition(i,:);
         funsq = @(s) vecFtlePullback(derivative, derivgrad, ic, s, t, t0, toleranceFD, useReduced, r);
         Integral(i, :) =  integral(funsq, t0, t, 'ArrayValued', true, 'AbsTol', toleranceInt);
-        send(D, i);
+        send(dq, i);
     end
 else
     for i = 1:nRows
@@ -110,8 +113,9 @@ function resultVec = vecFtlePullback(dy, derivgrad,  x0, s, t, t0, toleranceFD, 
     resultVec(2) = cgtrace;
 end
 
-function nUpdateWaitbar(~)
-        waitbar(p/N, h);
-        p = p + 1;
-    end
-
+function iIncrementWaitbar(wb)
+ud = wb.UserData;
+ud(1) = ud(1) + 1;
+waitbar(ud(1) / ud(2), wb);
+wb.UserData = ud;
+end
