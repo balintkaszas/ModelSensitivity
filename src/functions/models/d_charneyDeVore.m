@@ -1,4 +1,4 @@
-function dx = d_charneyDeVore(tau,x, params, useEoV,e,k, omega)
+function dx = d_charneyDeVore(tau,x, params, useEoV)
 
 dx = nan(size(x));
 
@@ -16,12 +16,7 @@ dx(3) = (alphm(1, b) .* x(1) - betam(beta, 1, b)) .* x(2) - gamm(gamma, 1, b) .*
 dx(4) = gstar(gamma, 2, b) .* x(6) - C*(x(4) - z4Star) + epsilon*(x(2).*x(6) - x(3).*x(5));
 dx(5) = -(alphm(2, b)*x(1) - betam(beta, 2, b)).*x(6) - C * x(5) - deltam(2, b) * x(4).*x(3);
 dx(6) =  (alphm(2, b)*x(1) - betam(beta, 2, b)).*x(5) - gamm(gamma, 2, b) * x(4) - C*x(6) + deltam(2,b) *x(4).*x(2);
-perturbationSize = zeros(size(x));
-if e > 0
-    perturbationSize= e.*error(x,tau,k, omega);
-end
 
-dx = dx + perturbationSize;
 if useEoV
     J11 = -C;
     J12 = 0;
@@ -94,14 +89,3 @@ end
 function delta = deltam(m, b)
 delta = ((64 * sqrt(2))/(15 * pi)) * (b^2 - m^2 +1) / (b^2 + m^2);
 end 
-
-
-function errorvector = error(x, t,k, omega)
-    z = 0.6; %length scale
-    errorvector = zeros(6,1);
-    
-    for i=1:6
-        ki = k(:,i)/z;
-        errorvector(i) = sin(dot(ki,x))*sin(omega*t);
-    end
-end
