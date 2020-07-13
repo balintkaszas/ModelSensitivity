@@ -1,4 +1,4 @@
-%%% Generate Duffing Model Sens. Fields
+%%Generate Monte Carlo data for the Charney DeVore model.
 epsilon = 0.01;
 omegapert = 10;
 %%CDV params:

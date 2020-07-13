@@ -1,4 +1,4 @@
-%%% Generate Duffing Model Sens. Fields
+%%% Generate Monte Carlo data for the damped-driven Duffing model
 
 omegapert = 10;
 dyref = @(t,x) d_phi(t,x,0, false);
