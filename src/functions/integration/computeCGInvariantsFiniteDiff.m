@@ -1,52 +1,40 @@
-function [cgEigenvalueMax, cgTrace] = computeCGInvariants(derivative, initialPosition, timeSpan, method, isParallel, tolerance)
-%%We trust this function... Tested against analytic example.
-%% Computes the largest eigenvalue of the Cauchy Green tensor, along with the trace
+function [cgEigenvalueMax, cgTrace] = computeCGInvariantsFiniteDiff(derivative, initialPosition, timeSpan, isParallel, difference, tolerance)
+%% Computes the largest eigenvalue of the Cauchy Green tensor, along with the trace from a finite difference approximation
 % Arguments:
 % derivative: function handle that returns RHS of the dynamical system 
-% xdot = f(x, t, epsilon)
-% Must be of the form: 
-% derivative = @(t,x,e, useEoV) deriv(t,x,epsilon,useEoV, params);
+%   xdot = f(x, t)
+%   Must be of the form: 
+%   derivative = @(t,x) deriv(t,x, params);
 %
 % initialPosition : Grid of initial positions. 
 %   number of rows: number of gridpoints in the computational domain
 %   number of columns: number of equations
 %
-% timeSpan: the time interval of integration timeSpan = [t0, t1]
-% 
-% method: 'finiteDifference' - Evaluate the flow map's derivative using an
-% auxiliary grid of relative spacing 1e-8.
-% method: 'eoV' - equation of variations. Must use useEoV flag in
-% derivative, which then has to return a n+n^2 dimensional vector of
-% derivatives.
+% timeSpan: the time interval of integration timeSpan = [t0, t]
 % 
 % isParallel: if true, will compute the invariants over the grid in
 % parallel.
 % 
+% difference: distance between gridpoints
+%
+% tolerance: absolute error tolerance for the integrator
+% 
 % Usage:
 % [lambdaMax,Traces] =
-% computeCGInvariants(derivative,initialPosition,timeSpan,'eoV', isParallel);
-%[lambdaMax,Traces] =
-% computeCGInvariants(derivative,initialPosition,timeSpan,'finiteDifference', isParallel);
+% computeCGInvariantsEOV(derivative,derivativeEOV, initialPosition, timeSpan, isParallel, tolerance);
 
-nSystem =  size(initialPosition,2); % number of variables
-nRows = size(initialPosition,1); %number of gridpoints
 
-switch method
-    case 'finiteDifference'
-        derivEov = @(t,x) derivative(t,x);
-        relDelta = 1e-5; %% convenience
-        differences = diff(initialPosition);
-        maximalDifference = max(differences, [], 'all'); %% max. difference over the grid
-        Diff = 1e-3; %% set a default value in this case
+    nSystem =  size(initialPosition,2); % number of variables
+    nRows = size(initialPosition,1); %number of gridpoints
+    relDelta = 1e-5; %% use 1e-5 times closer auxiliary gridpoints for finite differencing
 
-        dFlowmap = CGfromFD(derivEov, initialPosition, Diff, relDelta, timeSpan, isParallel, tolerance);
-end
+    dFlowmap = CGfromFD(derivative, initialPosition, difference, relDelta, timeSpan, isParallel, tolerance);
     %loop through the array of nSystem by nSystem matrices and compute
     %eigenvalues for each entry:
-    cgStrainD = arrayfun(@(idx)svd(dFlowmap(:,:,idx)),1:nRows,'UniformOutput',false); 
-    cgStrainD = cell2mat(cgStrainD);
-    cgEigenvalueMax = (cgStrainD(1,:).^2); %%svd already returns singular values sorted
-    cgTrace = sum(cgStrainD.^2, 1); %sum over columns, gives the trace
+    cgSvd = arrayfun(@(idx)svd(dFlowmap(:,:,idx)),1:nRows,'UniformOutput',false); 
+    cgSvd = cell2mat(cgSvd);
+    cgEigenvalueMax = (cgSvd(1,:).^2); %%svd already returns singular values sorted
+    cgTrace = sum(cgSvd.^2, 1); %sum over columns, gives the trace
 end
 
 

@@ -1,5 +1,5 @@
-%initialize_ic_grid Initialize initial conditions on cartesian grid
-function position = initialize_ic_grid(resolution,domain)
+%Generate uniformly distributed gridpoints
+function position = initializeGrid(resolution,domain)
 
 dimGrid = size(domain, 1);
 position=zeros(prod(resolution), dimGrid);

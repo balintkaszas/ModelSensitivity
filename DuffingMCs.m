@@ -3,7 +3,6 @@
 omegapert = 10;
 dyref = @(t,x) d_phi(t,x,0, false);
 dygrad = @(t,x) d_phi_grad(t,x);
-%dypert = @(t,x) d_phi(t,x,0, false) + [0;epsilon*cos(omegapert*t)];
 duff = DynSystem(dyref, 2, [1,1], dygrad);
 
 timeSpan1 = [0, 6*pi];
