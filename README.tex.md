@@ -144,9 +144,3 @@ The resulting MS field is
 
 An example, in which the MS field is computable analytically [2] is used for validation. The computation is detailed [here](test/validation.html).
 
-
-
-
-```python
-
-```
