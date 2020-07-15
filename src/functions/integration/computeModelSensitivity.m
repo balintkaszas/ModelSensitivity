@@ -28,8 +28,9 @@ if isParallel == true
     end
 else
     for i = 1:nRows
+        disp(i)
         ic = initialPosition(i,:);
-        funsq = @(s) vecFtlePullback(derivative, derivgrad, ic, s, t, t0, toleranceFD, useReduced, r);
+        funsq = @(s) vecFtlePullback(derivative, derivgrad, ic, s, t, t0, toleranceFD, method);
         Integral(i, :) =  integral(funsq, t0, t, 'ArrayValued', true, 'AbsTol', toleranceInt);
     end
 end

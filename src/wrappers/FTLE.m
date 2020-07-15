@@ -23,6 +23,6 @@ function ftle = FTLE(system, grid, timeSpan, isParallel, tolerance, method)
         otherwise
             disp('Unknown FTLE calculation method');
     end
-    ftle = reshape(log(cgEigmax), grid.resolution)/(timeSpan(1)-timeSpan(0));
+    ftle = reshape(log(cgEigmax), grid.resolution)/(2*(timeSpan(2)-timeSpan(1)));
 end
 

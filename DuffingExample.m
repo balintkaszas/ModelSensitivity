@@ -5,7 +5,7 @@ timeSpan = [0, 2*pi]; %% time span is one period of the driving
 duff = DynSystem(dyref, 2, [1,1]); % define the DynSystem object, with both Delta being 1
 
 %% Create the computational grid
-resolution = [10, 10]; 
+resolution = [100, 100]; 
 domain = [-1.5, 1.5; -1.5, 1.5];
 init = Grid(2, [1,2], resolution, domain, 1e-3);
 
