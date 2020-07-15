@@ -137,10 +137,11 @@ ms = modelSensitivity(duffing, init, timeSpan, true, 1e-7, 'finitedifference');
 ```
 
 The resulting MS field is 
-<img src="test/duffing_ms.png" alt="" width="200"/>
+
+<img src="test/duffing_ms.png" alt="" width="500"/>
 
 
 ## Validation 
 
-An example, in which the MS field is computable analytically [2] is used for validation. The computation is detailed [here](test/validation.html).
+An example, in which the MS field is computable analytically [2] is used for validation. The computation is detailed [here](test/validation.ipynb).
 
