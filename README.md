@@ -10,7 +10,7 @@ This software is made public for research use only. It may be modified and redis
 ## Motivation
 
 Calculation of bounds on prediction errors in dynamical systems subject to modeling uncertainties. 
-The theory is discussed in the manuscript B. K., G. Haller, __Universal Upper Estimate for Prediction Errors under Moderate Model Uncertainty__ (submitted).
+The theory is discussed in the manuscript B. K., G. Haller, __Universal Upper Estimate for Prediction Errors under Moderate Model Uncertainty__ (submitted) [1].
 
 Given a known dynamical system in the form 
 <p align="center"><img src="svgs/8ae26bb45da4a1da385d8831c338005d.svg?invert_in_darkmode" align=middle width=393.49880625pt height=16.438356pt/></p>
@@ -121,5 +121,8 @@ The resulting MS field is
 
 ## Validation 
 
-An example, in which the MS field is computable analytically [2] is used for validation. The computation is detailed [here](test/validation.ipynb).
+An example, in which the MS field is computable analytically is used for validation. The computation is detailed [here](test/validation.ipynb).
 
+## References
+
+[1] B. Kaszás, G. Haller, Universal Upper Estimate for Prediction Errors under Moderate Model Uncertainty, [arXiv:2007.07330 [nlin.CD]](https://arxiv.org/abs/2007.07330) (2020)
