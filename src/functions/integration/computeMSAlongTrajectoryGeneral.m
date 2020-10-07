@@ -7,7 +7,7 @@ for i=1:n
     iv = [timeInterval(1), timeInterval(1) + i*timeStep];
     % Resolution becomes [1,1] since we only follow
     % 1 point
-    disp(i)
+    disp(timeInterval(1) + i*timeStep); %print current time
     temp = computeModelSensitivity(derivative, derivativeEOV, initialPoint, iv, toleranceFD, toleranceInt, Deltas, false, method);
     uncertAtTime(i) = temp;
 end
