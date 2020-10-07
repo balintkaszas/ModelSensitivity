@@ -15,18 +15,18 @@ dygrad = @(t,x) d_charneyDeVore_grad(t,x,p);
 %dypert = @(t,x) d_phi(t,x,0, false) + [0;epsilon*cos(omegapert*t)];
 cdv = DynSystem(dyref, 6, [1,1], dygrad);
 
-timeSpan1 = [0, 15];
+timeSpan1 = [0, 45];
 k = rand(6,1)+1;
 b0 = rand(6,1)+1;
 b0 = b0./norm(b0);
 maxPlace = [0.7864,0.,0.8848, 0, 0., 0.];
 
-endtime = 15;
+endtime = 45;
 dT = 1e-4;
 time = 0:dT:endtime;
 [~,yfref] = ode45(dyref, time, maxPlace, odeset('RelTol', 1e-8));  %reference trajectory
 epsilon = 1e-2;
-[t,ms1] = modelSensitivityTrajectory(cdv, maxPlace, timeSpan1, 0.01, false, 0);
+[t,ms1] = modelSensitivityTrajectory(cdv, maxPlace, timeSpan1, 0.01, 1e-7, 'eov');
 disp('MS1 Done');
 
 sigma = eye(6)./6;
